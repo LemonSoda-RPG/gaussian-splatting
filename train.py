@@ -29,8 +29,11 @@ except ImportError:
     TENSORBOARD_FOUND = False
 
 def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoint_iterations, checkpoint, debug_from):
+    '''
+    dataset: 数据所在
+    '''
     first_iter = 0
-    tb_writer = prepare_output_and_logger(dataset)
+    tb_writer = prepare_output_and_logger(dataset)   # 检测是否指定了输出路径，并创建Tensorboard writer
     gaussians = GaussianModel(dataset.sh_degree)
     scene = Scene(dataset, gaussians)
     gaussians.training_setup(opt)
@@ -193,18 +196,18 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed, testing_i
 if __name__ == "__main__":
     # Set up command line argument parser
     parser = ArgumentParser(description="Training script parameters")
-    lp = ModelParams(parser)
-    op = OptimizationParams(parser)
-    pp = PipelineParams(parser)
-    parser.add_argument('--ip', type=str, default="127.0.0.1")
-    parser.add_argument('--port', type=int, default=6009)
-    parser.add_argument('--debug_from', type=int, default=-1)
+    lp = ModelParams(parser)  #存储参数
+    op = OptimizationParams(parser)   #存储参数
+    pp = PipelineParams(parser)   #存储参数
+    parser.add_argument('--ip', type=str, default="127.0.0.1")  #供远程查看器访问
+    parser.add_argument('--port', type=int, default=6009)  #端口
+    parser.add_argument('--debug_from', type=int, default=-1)   
     parser.add_argument('--detect_anomaly', action='store_true', default=False)
-    parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])
+    parser.add_argument("--test_iterations", nargs="+", type=int, default=[7_000, 30_000])  #迭代次数
     parser.add_argument("--save_iterations", nargs="+", type=int, default=[7_000, 30_000])
     parser.add_argument("--quiet", action="store_true")
-    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[])
-    parser.add_argument("--start_checkpoint", type=str, default = None)
+    parser.add_argument("--checkpoint_iterations", nargs="+", type=int, default=[])  #以空格分隔的迭代，用于存储检查点以便稍后继续，保存在模型目录中。
+    parser.add_argument("--start_checkpoint", type=str, default = None)  
     args = parser.parse_args(sys.argv[1:])
     args.save_iterations.append(args.iterations)
     
@@ -215,7 +218,7 @@ if __name__ == "__main__":
 
     # Start GUI server, configure and run training
     network_gui.init(args.ip, args.port)
-    torch.autograd.set_detect_anomaly(args.detect_anomaly)
+    torch.autograd.set_detect_anomaly(args.detect_anomaly)  #异常检测模式 当梯度计算出现异常时报错
     training(lp.extract(args), op.extract(args), pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from)
 
     # All done
