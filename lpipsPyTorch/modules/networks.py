@@ -32,7 +32,7 @@ class LinLayers(nn.ModuleList):
         for param in self.parameters():
             param.requires_grad = False
 
-
+#哈哈哈哈
 class BaseNet(nn.Module):
     def __init__(self):
         super(BaseNet, self).__init__()
