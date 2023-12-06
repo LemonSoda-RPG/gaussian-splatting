@@ -25,6 +25,7 @@ class Scene:
     def __init__(self, args : ModelParams, gaussians : GaussianModel, load_iteration=None, shuffle=True, resolution_scales=[1.0]):
         """b
         :param path: Path to colmap scene main folder.
+        :在此处读取了数据
         """
         self.model_path = args.model_path
         self.loaded_iter = None

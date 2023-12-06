@@ -47,14 +47,14 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
     iter_start = torch.cuda.Event(enable_timing = True)
     iter_end = torch.cuda.Event(enable_timing = True)
 
-    viewpoint_stack = None
+    viewpoint_stack = None  #可能时存储视点的堆
     ema_loss_for_log = 0.0
     progress_bar = tqdm(range(first_iter, opt.iterations), desc="Training progress")  #显示进度条
     first_iter += 1
     for iteration in range(first_iter, opt.iterations + 1):        
         if network_gui.conn == None:
             network_gui.try_connect()
-        while network_gui.conn != None:  #判断网络连接
+        while network_gui.conn != None:  #判断网络连接   网络查看器  先跳过不看
             try:
                 net_image_bytes = None
                 custom_cam, do_training, pipe.convert_SHs_python, pipe.compute_cov3D_python, keep_alive, scaling_modifer = network_gui.receive()
@@ -67,11 +67,12 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
             except Exception as e:
                 network_gui.conn = None
 
-        iter_start.record()
+        iter_start.record()  #记录时间
 
-        gaussians.update_learning_rate(iteration)
+        gaussians.update_learning_rate(iteration)  #更新迭代次数
 
         # Every 1000 its we increase the levels of SH up to a maximum degree
+        # 增加球谐函数的最大阶数
         if iteration % 1000 == 0:
             gaussians.oneupSHdegree()
 
