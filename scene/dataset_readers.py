@@ -137,7 +137,12 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
         cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
     except:
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.txt")
-        cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.txt")
+        # images中保存的是所有照片的外参以及所有图片中的特征点对应的像素坐标，以及这个特征点对应的3d点的id
+        # IMAGE_ID, QW, QX, QY, QZ, TX, TY, TZ, CAMERA_ID, NAME
+        # POINTS2D[] as (X, Y, POINT3D_ID)
+        # 如果3d_id是-1   说明没有这个特征点的3d点
+        cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.txt")   
+        # cameras.txt保存的是所有照片相机的内参  所以每张照片几乎都是一样的 
         cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
@@ -256,5 +261,5 @@ def readNerfSyntheticInfo(path, white_background, eval, extension=".png"):
 
 sceneLoadTypeCallbacks = {
     "Colmap": readColmapSceneInfo,
-    "Blender" : readNerfSyntheticInfo
+    "Blender" : readNerfSyntheticInfo    #nerf数据
 }

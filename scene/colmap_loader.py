@@ -254,15 +254,15 @@ def read_extrinsics_text(path):
             line = line.strip()
             if len(line) > 0 and line[0] != "#":
                 elems = line.split()
-                image_id = int(elems[0])
-                qvec = np.array(tuple(map(float, elems[1:5])))
-                tvec = np.array(tuple(map(float, elems[5:8])))
-                camera_id = int(elems[8])
-                image_name = elems[9]
-                elems = fid.readline().split()
-                xys = np.column_stack([tuple(map(float, elems[0::3])),
+                image_id = int(elems[0])  #图片id
+                qvec = np.array(tuple(map(float, elems[1:5])))  #四元数
+                tvec = np.array(tuple(map(float, elems[5:8])))  #平移向量
+                camera_id = int(elems[8])  #相机id  和图片id一样
+                image_name = elems[9]  #图片名字
+                elems = fid.readline().split()   #读取下一行 并切片
+                xys = np.column_stack([tuple(map(float, elems[0::3])),  #读取特征点的像素xy坐标
                                        tuple(map(float, elems[1::3]))])
-                point3D_ids = np.array(tuple(map(int, elems[2::3])))
+                point3D_ids = np.array(tuple(map(int, elems[2::3])))   #读取特征点对应的地图点id
                 images[image_id] = Image(
                     id=image_id, qvec=qvec, tvec=tvec,
                     camera_id=camera_id, name=image_name,
