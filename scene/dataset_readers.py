@@ -44,12 +44,12 @@ class SceneInfo(NamedTuple):
 
 def getNerfppNorm(cam_info):
     def get_center_and_diag(cam_centers):
-        cam_centers = np.hstack(cam_centers)
-        avg_cam_center = np.mean(cam_centers, axis=1, keepdims=True)
+        cam_centers = np.hstack(cam_centers)  #
+        avg_cam_center = np.mean(cam_centers, axis=1, keepdims=True) #计算所有相机坐标的平均坐标  中心点
         center = avg_cam_center
-        dist = np.linalg.norm(cam_centers - center, axis=0, keepdims=True)
-        diagonal = np.max(dist)
-        return center.flatten(), diagonal
+        dist = np.linalg.norm(cam_centers - center, axis=0, keepdims=True)  #计算所有相机到中心点的距离
+        diagonal = np.max(dist)  #取得最大距离
+        return center.flatten(), diagonal  #! 返回中心点以及最大距离
 
     cam_centers = []
 
@@ -57,9 +57,9 @@ def getNerfppNorm(cam_info):
         W2C = getWorld2View2(cam.R, cam.T)
         C2W = np.linalg.inv(W2C)
         cam_centers.append(C2W[:3, 3:4])
-
-    center, diagonal = get_center_and_diag(cam_centers)
-    radius = diagonal * 1.1
+    
+    center, diagonal = get_center_and_diag(cam_centers) #! 返回中心点以及最大距离
+    radius = diagonal * 1.1  #最大距离乘1.1
 
     translate = -center
 
@@ -110,7 +110,7 @@ def fetchPly(path):
     positions = np.vstack([vertices['x'], vertices['y'], vertices['z']]).T
     colors = np.vstack([vertices['red'], vertices['green'], vertices['blue']]).T / 255.0
     normals = np.vstack([vertices['nx'], vertices['ny'], vertices['nz']]).T
-    return BasicPointCloud(points=positions, colors=colors, normals=normals)
+    return BasicPointCloud(points=positions, colors=colors, normals=normals)  #  normals  法线向量
 
 def storePly(path, xyz, rgb):
     # Define the dtype for the structured array
@@ -129,7 +129,7 @@ def storePly(path, xyz, rgb):
     ply_data = PlyData([vertex_element])
     ply_data.write(path)
 
-def readColmapSceneInfo(path, images, eval, llffhold=8):
+def readColmapSceneInfo(path, images, eval, llffhold=8):  # eval 默认为 false
     try:
         cameras_extrinsic_file = os.path.join(path, "sparse/0", "images.bin")
         cameras_intrinsic_file = os.path.join(path, "sparse/0", "cameras.bin")
@@ -147,7 +147,10 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
 
     reading_dir = "images" if images == None else images
+    # 读取照片信息
+    # cam_infos_unsorted 保存图片信息 图片位置  位姿 以及图片的参数
     cam_infos_unsorted = readColmapCameras(cam_extrinsics=cam_extrinsics, cam_intrinsics=cam_intrinsics, images_folder=os.path.join(path, reading_dir))
+    # 排序之后的图片  根据图片名称进行排序
     cam_infos = sorted(cam_infos_unsorted.copy(), key = lambda x : x.image_name)
 
     if eval:
@@ -157,7 +160,7 @@ def readColmapSceneInfo(path, images, eval, llffhold=8):
         train_cam_infos = cam_infos
         test_cam_infos = []
 
-    nerf_normalization = getNerfppNorm(train_cam_infos)
+    nerf_normalization = getNerfppNorm(train_cam_infos)   # 这个好像之后都没有用到啊
 
     ply_path = os.path.join(path, "sparse/0/points3D.ply")
     bin_path = os.path.join(path, "sparse/0/points3D.bin")
