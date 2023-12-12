@@ -29,7 +29,7 @@ all_scenes.extend(mipnerf360_outdoor_scenes)
 all_scenes.extend(mipnerf360_indoor_scenes)
 all_scenes.extend(tanks_and_temples_scenes)
 all_scenes.extend(deep_blending_scenes)
-
+# test
 if not args.skip_training or not args.skip_rendering:
     parser.add_argument('--mipnerf360', "-m360", required=True, type=str)
     parser.add_argument("--tanksandtemples", "-tat", required=True, type=str)
